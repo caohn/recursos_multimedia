@@ -52,7 +52,7 @@ export const useAppData = () => {
 
     setState(prev => ({
       ...prev,
-      isAuthenticated: true, // Always start authenticated for viewing
+      isAuthenticated: savedAuth === 'true',
       resources: savedResources ? JSON.parse(savedResources) : [],
       categories: savedCategories ? JSON.parse(savedCategories) : defaultCategories,
     }));
