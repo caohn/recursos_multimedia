@@ -37,7 +37,7 @@ export const useAppData = () => {
       const { data: resourcesData, error: resourcesError } = await supabase
         .from('resources')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (resourcesError) throw resourcesError;
 
