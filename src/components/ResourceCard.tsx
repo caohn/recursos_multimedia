@@ -205,7 +205,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                  onClick={() => onEdit(resource)}
+                    onEdit(resource);
                   }}
                   className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Editar"
@@ -215,7 +215,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                  onClick={() => onDelete(resource.id)}
+                    onDelete(resource.id);
                   }}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Eliminar"
