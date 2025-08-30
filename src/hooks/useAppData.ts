@@ -237,12 +237,10 @@ export const useAppData = () => {
 
       console.log('📤 Sending to Supabase:', { id, updateData });
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('categories')
         .update(updateData)
-        .eq('id', id)
-        .select()
-        .single();
+        .eq('id', id);
 
       console.log('📥 Supabase response:', { data, error });
 
@@ -251,11 +249,8 @@ export const useAppData = () => {
         throw new Error(`Error de Supabase: ${error.message}`);
       }
 
-      if (!data) {
-        throw new Error('No se recibieron datos de la actualización');
-      }
-
-      console.log('✅ Category updated successfully in Supabase:', data);
+      console.log('✅ Category updated successfully in Supabase');
+      
       // Actualizar estado local
       setState(prev => ({
         ...prev,
@@ -263,11 +258,7 @@ export const useAppData = () => {
           category.id === id 
             ? { 
                 ...category, 
-                name: data.name,
-                color: data.color,
-                description: data.description,
-                icon: data.icon,
-                resourceType: data.resource_type,
+                ...categoryData,
               } 
             : category
         ),
