@@ -53,37 +53,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  const resourceTypes = [
-    {
-      id: 'documents',
-      name: 'Documentos',
-      icon: FileText,
-      color: '#10B981',
-      categories: categories.filter(cat => cat.resourceType === 'documents')
-    },
-    {
-      id: 'links',
-      name: 'Enlaces',
-      icon: Link,
-      color: '#3B82F6',
-      categories: categories.filter(cat => cat.resourceType === 'links')
-    },
-    {
-      id: 'media',
-      name: 'Multimedia',
-      icon: Upload,
-      color: '#F59E0B',
-      categories: categories.filter(cat => cat.resourceType === 'media')
-    },
-    {
-      id: 'other',
-      name: 'Otros',
-      icon: Layers,
-      color: '#8B5CF6',
-      categories: categories.filter(cat => cat.resourceType === 'other')
-    }
-  ].filter(type => type.categories.length > 0);
-
   return (
     <aside className={`bg-white border-r border-gray-200 transition-all duration-300 ${
       isCollapsed ? 'w-16' : 'w-72'
@@ -101,9 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <FolderOpen className="h-5 w-5 flex-shrink-0" />
             {!isCollapsed && (
-              <>
-                <span className="font-medium">Todos los recursos</span>
-              </>
+              <span className="font-medium">Todos los recursos</span>
             )}
           </button>
         </div>

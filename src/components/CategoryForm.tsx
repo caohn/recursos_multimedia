@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Folder, Palette } from 'lucide-react';
+import { X, Folder, FileText, Link, Upload, Layers } from 'lucide-react';
 import { Category } from '../types';
 
 interface CategoryFormProps {
@@ -37,10 +37,34 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   });
 
   const resourceTypes = [
-    { id: 'documents', name: 'Documentos', icon: FileText, color: '#10B981' },
-    { id: 'links', name: 'Enlaces', icon: Link, color: '#3B82F6' },
-    { id: 'media', name: 'Multimedia', icon: Upload, color: '#F59E0B' },
-    { id: 'other', name: 'Otros', icon: Folder, color: '#8B5CF6' },
+    { 
+      id: 'documents', 
+      name: 'Documentos', 
+      icon: FileText, 
+      color: '#10B981',
+      description: 'PDFs, documentos de texto, presentaciones'
+    },
+    { 
+      id: 'links', 
+      name: 'Enlaces', 
+      icon: Link, 
+      color: '#3B82F6',
+      description: 'Sitios web, artículos, recursos online'
+    },
+    { 
+      id: 'media', 
+      name: 'Multimedia', 
+      icon: Upload, 
+      color: '#F59E0B',
+      description: 'Imágenes, videos, audio, archivos multimedia'
+    },
+    { 
+      id: 'other', 
+      name: 'Otros', 
+      icon: Layers, 
+      color: '#8B5CF6',
+      description: 'Archivos diversos y otros tipos de recursos'
+    },
   ];
 
   useEffect(() => {
@@ -97,7 +121,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Tipo de recurso *
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {resourceTypes.map((type) => {
                 const Icon = type.icon;
                 return (
@@ -105,14 +129,36 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                     key={type.id}
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, resourceType: type.id as Category['resourceType'] }))}
-                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left ${
                       formData.resourceType === type.id
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                        ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-blue-100 shadow-md transform scale-[1.02]'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <Icon className="h-5 w-5" style={{ color: formData.resourceType === type.id ? '#3B82F6' : type.color }} />
-                    <span className="font-medium">{type.name}</span>
+                    <div className={`p-2 rounded-lg ${
+                      formData.resourceType === type.id 
+                        ? 'bg-white shadow-sm' 
+                        : 'bg-gray-100'
+                    }`}>
+                      <Icon 
+                        className="h-5 w-5" 
+                        style={{ 
+                          color: formData.resourceType === type.id ? type.color : '#6B7280' 
+                        }} 
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className={`font-semibold ${
+                        formData.resourceType === type.id ? 'text-blue-900' : 'text-gray-900'
+                      }`}>
+                        {type.name}
+                      </h4>
+                      <p className={`text-sm mt-1 ${
+                        formData.resourceType === type.id ? 'text-blue-700' : 'text-gray-600'
+                      }`}>
+                        {type.description}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
