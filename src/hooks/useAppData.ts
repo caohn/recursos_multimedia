@@ -219,27 +219,38 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      const updateData: any = {};
-      
-      if (categoryData.name !== undefined) updateData.name = categoryData.name;
-      if (categoryData.color !== undefined) updateData.color = categoryData.color;
-      if (categoryData.description !== undefined) updateData.description = categoryData.description;
-      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
-      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
+      // Preparar datos para Supabase (convertir resourceType a resource_type)
+      const updateData = {
+        name: categoryData.name,
+        color: categoryData.color,
+        description: categoryData.description,
+        icon: categoryData.icon,
+        resource_type: categoryData.resourceType,
+      };
+
+      console.log('📤 Sending to Supabase:', updateData);
 
       const { error } = await supabase
         .from('categories')
         .update(updateData)
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw error;
+      }
+
+      console.log('✅ Supabase update successful');
       
+      // Actualizar estado local
       setState(prev => ({
         ...prev,
         categories: prev.categories.map(category =>
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
+
+      console.log('✅ Local state updated');
       
     } catch (error) {
       console.error('Error updating category:', error);
