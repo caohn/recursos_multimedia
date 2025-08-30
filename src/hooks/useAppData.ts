@@ -219,18 +219,20 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      console.log('Updating category:', { id, categoryData });
+      // Preparar datos para Supabase
+      const updateData: any = {};
       
-      // Convertir campos del frontend al formato de la base de datos
+      if (categoryData.name !== undefined) updateData.name = categoryData.name;
+      if (categoryData.color !== undefined) updateData.color = categoryData.color;
+      if (categoryData.description !== undefined) updateData.description = categoryData.description;
+      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
+      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
+      
+      console.log('Updating category in Supabase:', { id, updateData });
+      
       const { error } = await supabase
         .from('categories')
-        .update({
-          name: categoryData.name,
-          color: categoryData.color,
-          description: categoryData.description,
-          icon: categoryData.icon,
-          resource_type: categoryData.resourceType, // Asegurar que el campo coincida con la DB
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) {
@@ -238,7 +240,7 @@ export const useAppData = () => {
         throw error;
       }
 
-      console.log('Category updated in Supabase successfully');
+      console.log('Category updated successfully in Supabase');
 
       // Actualizar estado local solo si Supabase fue exitoso
       setState(prev => ({
@@ -247,13 +249,9 @@ export const useAppData = () => {
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
-
-      console.log('Category updated successfully:', { id, categoryData });
     } catch (error) {
       console.error('Error updating category:', error);
-      alert(`Error al actualizar la categoría: ${error.message || 'Error desconocido'}`);
-      // Recargar datos para asegurar consistencia
-      loadInitialData();
+      alert(`Error al actualizar la categoría: ${error?.message || 'Error desconocido'}`);
     }
   };
 
