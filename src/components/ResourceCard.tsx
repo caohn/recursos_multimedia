@@ -9,6 +9,7 @@ interface ResourceCardProps {
   onDelete: (resourceId: string) => void;
   view: 'grid' | 'list';
   isAuthenticated: boolean;
+  onOpenVideo: (url: string, title: string) => void;
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
@@ -45,10 +46,6 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     const videoPatterns = [
       /youtube\.com\/watch\?v=([^&]+)/,
       /youtu\.be\/([^?]+)/,
-      /vimeo\.com\/(\d+)/,
-      /\.mp4$/i,
-      /\.webm$/i,
-      /\.ogg$/i,
     ];
     return videoPatterns.some(pattern => pattern.test(url));
   };
@@ -62,7 +59,9 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   };
 
   const handleOpen = () => {
-    if (resource.type === 'link' && resource.url) {
+    if (resource.type === 'link' && resource.url && isVideoUrl(resource.url)) {
+      onOpenVideo(resource.url, resource.title);
+    } else if (resource.type === 'link' && resource.url) {
       window.open(resource.url, '_blank');
     } else if (resource.url && (resource.type === 'file' || resource.type === 'document')) {
       window.open(resource.url, '_blank');

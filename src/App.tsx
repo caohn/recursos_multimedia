@@ -6,6 +6,7 @@ import { ResourceCard } from './components/ResourceCard';
 import { ResourceForm } from './components/ResourceForm';
 import { CategoryForm } from './components/CategoryForm';
 import { LoginModal } from './components/LoginModal';
+import { VideoModal } from './components/VideoModal';
 import { useAppData } from './hooks/useAppData';
 import { Resource, Category } from './types';
 
@@ -17,6 +18,11 @@ function App() {
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [videoModal, setVideoModal] = useState<{ isOpen: boolean; url: string; title: string }>({
+    isOpen: false,
+    url: '',
+    title: '',
+  });
 
   const handleResourceSubmit = (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingResource) {
@@ -70,6 +76,14 @@ function App() {
     actions.login();
     setIsLoginModalOpen(false);
     setIsResourceFormOpen(true);
+  };
+
+  const handleOpenVideo = (url: string, title: string) => {
+    setVideoModal({ isOpen: true, url, title });
+  };
+
+  const handleCloseVideo = () => {
+    setVideoModal({ isOpen: false, url: '', title: '' });
   };
 
   const getCategoryById = (id: string) => {
@@ -187,6 +201,7 @@ function App() {
                     onDelete={actions.deleteResource}
                     view={state.view}
                     isAuthenticated={state.isAuthenticated}
+                    onOpenVideo={handleOpenVideo}
                   />
                 ))}
               </div>
@@ -229,6 +244,13 @@ function App() {
         }}
         onSubmit={handleCategorySubmit}
         editingCategory={editingCategory}
+      />
+
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={handleCloseVideo}
+        videoUrl={videoModal.url}
+        title={videoModal.title}
       />
     </div>
   );
