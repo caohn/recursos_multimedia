@@ -60,11 +60,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     }
     return null;
   };
+
   const handleOpen = () => {
     if (resource.type === 'link' && resource.url) {
       window.open(resource.url, '_blank');
     } else if (resource.url && (resource.type === 'file' || resource.type === 'document')) {
-      // Para archivos almacenados en Supabase Storage, abrir en nueva pestaña
       window.open(resource.url, '_blank');
     }
   };
@@ -86,18 +86,10 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-              {category.name === 'Lecciones M&M' ? (
-                <img 
-                  src="https://igcsl.org/subidas/logomm.png" 
-                  alt="M&M Logo" 
-                  className="w-3 h-3 rounded-full object-cover"
-                />
-              ) : (
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: category.color }}
-                />
-              )}
+                  target.style.display = 'none';
+                  target.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
               <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
                 <TypeIcon className="h-5 w-5" />
               </div>
@@ -202,26 +194,40 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
               <TypeIcon className="h-8 w-8" />
             </div>
-                    e.stopPropagation();
-                    onEdit(resource);
-                  }}
-                  className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Editar"
-                >
-                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(resource.id);
-                  }}
-                  className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Eliminar"
-                >
-                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                </button>
+            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div className="w-4 h-4 sm:w-6 sm:h-6 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                <div className="w-0 h-0 border-l-[4px] sm:border-l-[6px] border-l-gray-800 border-y-[3px] sm:border-y-[4px] border-y-transparent ml-0.5"></div>
               </div>
-            )}
+            </div>
+          </div>
+        ) : (
+          <div className={`p-2 sm:p-3 rounded-lg ${getTypeColor(resource.type)}`}>
+            <TypeIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+        )}
+
+        {isAuthenticated && (
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(resource);
+              }}
+              className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Editar"
+            >
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(resource.id);
+              }}
+              className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Eliminar"
+            >
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </button>
           </div>
         )}
       </div>
