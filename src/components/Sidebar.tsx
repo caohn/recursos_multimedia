@@ -28,28 +28,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       name: 'Documentos',
       icon: FileText,
       color: '#10B981',
-      categories: categories.filter(cat => cat.resourceType === 'documents')
+      categories: categories.filter(cat => cat.resourceType === 'documents' || (!cat.resourceType && cat.name.toLowerCase().includes('documento')))
     },
     {
       id: 'links',
       name: 'Enlaces',
       icon: Link,
       color: '#3B82F6',
-      categories: categories.filter(cat => cat.resourceType === 'links')
+      categories: categories.filter(cat => cat.resourceType === 'links' || (!cat.resourceType && cat.name.toLowerCase().includes('enlace')))
     },
     {
       id: 'media',
       name: 'Multimedia',
       icon: Image,
       color: '#F59E0B',
-      categories: categories.filter(cat => cat.resourceType === 'media')
+      categories: categories.filter(cat => cat.resourceType === 'media' || (!cat.resourceType && cat.name.toLowerCase().includes('multimedia')))
     },
     {
       id: 'other',
       name: 'Otros',
       icon: Layers,
       color: '#8B5CF6',
-      categories: categories.filter(cat => cat.resourceType === 'other')
+      categories: categories.filter(cat => cat.resourceType === 'other' || (!cat.resourceType && !cat.name.toLowerCase().includes('documento') && !cat.name.toLowerCase().includes('enlace') && !cat.name.toLowerCase().includes('multimedia')))
     }
   ];
 

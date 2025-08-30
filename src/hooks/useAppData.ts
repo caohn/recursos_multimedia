@@ -14,6 +14,7 @@ const defaultCategories: Category[] = [
     color: '#3B82F6',
     description: 'Documentos oficiales y certificaciones',
     icon: 'folder',
+    resourceType: 'documents',
   },
   {
     id: '2',
@@ -21,6 +22,7 @@ const defaultCategories: Category[] = [
     color: '#10B981',
     description: 'Enlaces web de interés',
     icon: 'folder',
+    resourceType: 'links',
   },
   {
     id: '3',
@@ -28,6 +30,7 @@ const defaultCategories: Category[] = [
     color: '#F59E0B',
     description: 'Imágenes, videos y audio',
     icon: 'folder',
+    resourceType: 'media',
   },
 ];
 
