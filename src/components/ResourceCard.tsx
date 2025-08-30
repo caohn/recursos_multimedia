@@ -10,6 +10,7 @@ interface ResourceCardProps {
   view: 'grid' | 'list';
   isAuthenticated: boolean;
   onOpenVideo: (url: string, title: string) => void;
+  onOpenVideo: (url: string, title: string) => void;
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
@@ -19,6 +20,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   onDelete,
   view,
   isAuthenticated,
+  onOpenVideo,
 }) => {
   const getTypeIcon = (type: Resource['type']) => {
     switch (type) {
