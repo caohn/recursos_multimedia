@@ -169,7 +169,10 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
+    <div 
+      className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 group cursor-pointer"
+      onClick={handleOpen}
+    >
       <div className="flex items-start justify-between mb-4">
         {videoThumbnail ? (
           <div className="relative w-full h-32 rounded-lg overflow-hidden bg-gray-100 mb-4">
@@ -191,11 +194,6 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 <div className="w-0 h-0 border-l-[12px] border-l-gray-800 border-y-[8px] border-y-transparent ml-1"></div>
               </div>
             </div>
-            <button
-              onClick={handleOpen}
-              className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all cursor-pointer"
-            >
-            </button>
           </div>
         ) : (
           <div className="flex items-start justify-between w-full">
@@ -205,14 +203,20 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             {isAuthenticated && (
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                   onClick={() => onEdit(resource)}
+                  }}
                   className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Editar"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
                 <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                   onClick={() => onDelete(resource.id)}
+                  }}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Eliminar"
                 >

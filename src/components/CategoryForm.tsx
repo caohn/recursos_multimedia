@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Folder, FileText, Link, Upload, Layers } from 'lucide-react';
+import { X, Folder } from 'lucide-react';
 import { Category } from '../types';
 
 interface CategoryFormProps {
@@ -36,37 +36,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     resourceType: 'documents' as Category['resourceType'],
   });
 
-  const resourceTypes = [
-    { 
-      id: 'documents', 
-      name: 'Documentos', 
-      icon: FileText, 
-      color: '#10B981',
-      description: 'PDFs, documentos de texto, presentaciones'
-    },
-    { 
-      id: 'links', 
-      name: 'Enlaces', 
-      icon: Link, 
-      color: '#3B82F6',
-      description: 'Sitios web, artículos, recursos online'
-    },
-    { 
-      id: 'media', 
-      name: 'Multimedia', 
-      icon: Upload, 
-      color: '#F59E0B',
-      description: 'Imágenes, videos, audio, archivos multimedia'
-    },
-    { 
-      id: 'other', 
-      name: 'Otros', 
-      icon: Layers, 
-      color: '#8B5CF6',
-      description: 'Archivos diversos y otros tipos de recursos'
-    },
-  ];
-
   useEffect(() => {
     if (editingCategory) {
       setFormData({
@@ -100,75 +69,26 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="border-b border-gray-200 p-6 rounded-t-2xl">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <div className="border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900">
               {editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Tipo de recurso */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Tipo de recurso *
-            </label>
-            <div className="grid grid-cols-1 gap-3">
-              {resourceTypes.map((type) => {
-                const Icon = type.icon;
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, resourceType: type.id as Category['resourceType'] }))}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                      formData.resourceType === type.id
-                        ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-blue-100 shadow-md transform scale-[1.02]'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className={`p-2 rounded-lg ${
-                      formData.resourceType === type.id 
-                        ? 'bg-white shadow-sm' 
-                        : 'bg-gray-100'
-                    }`}>
-                      <Icon 
-                        className="h-5 w-5" 
-                        style={{ 
-                          color: formData.resourceType === type.id ? type.color : '#6B7280' 
-                        }} 
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className={`font-semibold ${
-                        formData.resourceType === type.id ? 'text-blue-900' : 'text-gray-900'
-                      }`}>
-                        {type.name}
-                      </h4>
-                      <p className={`text-sm mt-1 ${
-                        formData.resourceType === type.id ? 'text-blue-700' : 'text-gray-600'
-                      }`}>
-                        {type.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Nombre */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nombre de la categoría *
+              Nombre *
             </label>
             <div className="relative">
               <Folder className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -183,20 +103,38 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             </div>
           </div>
 
+          {/* Tipo de recurso */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tipo de recurso *
+            </label>
+            <select
+              value={formData.resourceType}
+              onChange={(e) => setFormData(prev => ({ ...prev, resourceType: e.target.value as Category['resourceType'] }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="documents">Documentos</option>
+              <option value="links">Enlaces</option>
+              <option value="media">Multimedia</option>
+              <option value="other">Otros</option>
+            </select>
+          </div>
+
           {/* Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Color de identificación
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Color
             </label>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="flex flex-wrap gap-2">
               {colorOptions.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, color }))}
-                  className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${
                     formData.color === color
-                      ? 'border-gray-800 scale-110 shadow-lg'
+                      ? 'border-gray-800 scale-110'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   style={{ backgroundColor: color }}
@@ -214,13 +152,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
+              rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              placeholder="Descripción opcional de la categoría"
+              placeholder="Descripción opcional"
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
@@ -232,7 +170,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               type="submit"
               className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {editingCategory ? 'Actualizar' : 'Crear categoría'}
+              {editingCategory ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
