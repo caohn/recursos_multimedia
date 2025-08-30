@@ -216,33 +216,17 @@ export const useAppData = () => {
       alert('Error al agregar la categoría. Inténtalo de nuevo.');
     }
   };
-
-  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
-    try {
-      console.log('🔄 Actualizando categoría:', id, categoryData);
-
-      // Mapear correctamente los campos para Supabase
-      const updateData: any = {};
-      if (categoryData.name !== undefined) updateData.name = categoryData.name;
-      if (categoryData.color !== undefined) updateData.color = categoryData.color;
-      if (categoryData.description !== undefined) updateData.description = categoryData.description;
-      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
-      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
-
-      console.log('📤 Datos a enviar a Supabase:', updateData);
-
-      const { error } = await supabase
-        .from('categories')
+          ...(categoryData.name && { name: categoryData.name }),
+          ...(categoryData.color && { color: categoryData.color }),
+          ...(categoryData.description !== undefined && { description: categoryData.description }),
+          ...(categoryData.icon && { icon: categoryData.icon }),
+          ...(categoryData.resourceType && { resource_type: categoryData.resourceType }),
         .update(updateData)
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) {
-        console.error('❌ Error de Supabase:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('✅ Categoría actualizada en Supabase');
-      
       // Actualizar estado local
       setState(prev => ({
         ...prev,
@@ -250,9 +234,6 @@ export const useAppData = () => {
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
-
-      console.log('✅ Estado local actualizado');
-      
     } catch (error) {
       console.error('💥 Error completo:', error);
       alert('Error al actualizar la categoría. Inténtalo de nuevo.');
