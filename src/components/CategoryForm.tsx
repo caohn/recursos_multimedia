@@ -33,7 +33,15 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     color: colorOptions[0],
     description: '',
     icon: 'folder',
+    resourceType: 'documents' as Category['resourceType'],
   });
+
+  const resourceTypes = [
+    { id: 'documents', name: 'Documentos', icon: FileText, color: '#10B981' },
+    { id: 'links', name: 'Enlaces', icon: Link, color: '#3B82F6' },
+    { id: 'media', name: 'Multimedia', icon: Upload, color: '#F59E0B' },
+    { id: 'other', name: 'Otros', icon: Folder, color: '#8B5CF6' },
+  ];
 
   useEffect(() => {
     if (editingCategory) {
@@ -42,6 +50,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         color: editingCategory.color,
         description: editingCategory.description,
         icon: editingCategory.icon,
+        resourceType: editingCategory.resourceType,
       });
     } else {
       setFormData({
@@ -49,6 +58,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         color: colorOptions[0],
         description: '',
         icon: 'folder',
+        resourceType: 'documents',
       });
     }
   }, [editingCategory, isOpen]);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Folder, FolderOpen, Plus, Edit, FileText, Link, Upload, Layers } from 'lucide-react';
+import { Folder, FolderOpen, Plus, Edit, FileText, Link, Upload, Layers, Image } from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
@@ -22,6 +22,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isAuthenticated,
 }) => {
   // Agrupar categorías por tipo de recurso
+  const resourceTypes = [
+    {
+      id: 'documents',
+      name: 'Documentos',
+      icon: FileText,
+      color: '#10B981',
+      categories: categories.filter(cat => cat.resourceType === 'documents')
+    },
+    {
+      id: 'links',
+      name: 'Enlaces',
+      icon: Link,
+      color: '#3B82F6',
+      categories: categories.filter(cat => cat.resourceType === 'links')
+    },
+    {
+      id: 'media',
+      name: 'Multimedia',
+      icon: Image,
+      color: '#F59E0B',
+      categories: categories.filter(cat => cat.resourceType === 'media')
+    },
+    {
+      id: 'other',
+      name: 'Otros',
+      icon: Layers,
+      color: '#8B5CF6',
+      categories: categories.filter(cat => cat.resourceType === 'other')
+    }
+  ];
+
   const resourceTypes = [
     {
       id: 'documents',
@@ -94,7 +125,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {resourceTypes.map((type) => (
+          {resourceTypes.filter(type => type.categories.length > 0).map((type) => (
             <div key={type.id} className="space-y-2">
               {!isCollapsed && (
                 <div className="flex items-center gap-2 px-2 py-1">
