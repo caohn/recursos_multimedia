@@ -17,6 +17,7 @@ export interface Category {
   color: string;
   description: string;
   icon: string;
+  resourceType: 'documents' | 'links' | 'media' | 'other';
 }
 
 export interface AppState {

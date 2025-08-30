@@ -82,6 +82,33 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Tipo de recurso */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Tipo de recurso *
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {resourceTypes.map((type) => {
+                const Icon = type.icon;
+                return (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, resourceType: type.id as Category['resourceType'] }))}
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                      formData.resourceType === type.id
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" style={{ color: formData.resourceType === type.id ? '#3B82F6' : type.color }} />
+                    <span className="font-medium">{type.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Nombre */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

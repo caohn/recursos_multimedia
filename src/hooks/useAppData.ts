@@ -66,7 +66,7 @@ export const useAppData = () => {
   };
 
   const logout = () => {
-    setState(prev => ({ ...prev, isAuthenticated: true })); // Keep viewing access
+    setState(prev => ({ ...prev, isAuthenticated: false }));
     localStorage.removeItem(STORAGE_KEYS.AUTH);
   };
 

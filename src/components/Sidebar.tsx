@@ -28,38 +28,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       name: 'Documentos',
       icon: FileText,
       color: '#10B981',
-      categories: categories.filter(cat => cat.name.toLowerCase().includes('documento') || cat.name.toLowerCase().includes('certificado') || cat.name.toLowerCase().includes('oficial'))
+      categories: categories.filter(cat => cat.resourceType === 'documents')
     },
     {
       id: 'links',
       name: 'Enlaces',
       icon: Link,
       color: '#3B82F6',
-      categories: categories.filter(cat => cat.name.toLowerCase().includes('enlace') || cat.name.toLowerCase().includes('web') || cat.name.toLowerCase().includes('útil'))
+      categories: categories.filter(cat => cat.resourceType === 'links')
     },
     {
       id: 'media',
       name: 'Multimedia',
       icon: Upload,
       color: '#F59E0B',
-      categories: categories.filter(cat => cat.name.toLowerCase().includes('multimedia') || cat.name.toLowerCase().includes('imagen') || cat.name.toLowerCase().includes('video'))
+      categories: categories.filter(cat => cat.resourceType === 'media')
     },
     {
       id: 'other',
       name: 'Otros',
       icon: Layers,
       color: '#8B5CF6',
-      categories: categories.filter(cat => 
-        !cat.name.toLowerCase().includes('documento') && 
-        !cat.name.toLowerCase().includes('certificado') && 
-        !cat.name.toLowerCase().includes('oficial') &&
-        !cat.name.toLowerCase().includes('enlace') && 
-        !cat.name.toLowerCase().includes('web') && 
-        !cat.name.toLowerCase().includes('útil') &&
-        !cat.name.toLowerCase().includes('multimedia') && 
-        !cat.name.toLowerCase().includes('imagen') && 
-        !cat.name.toLowerCase().includes('video')
-      )
+      categories: categories.filter(cat => cat.resourceType === 'other')
     }
   ].filter(type => type.categories.length > 0);
 
