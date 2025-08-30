@@ -1,5 +1,5 @@
 import React from 'react';
-import { Folder, FolderOpen, Plus, Edit, FileText, Link, Upload, Layers, Image } from 'lucide-react';
+import { Folder, FolderOpen, Plus, Edit, FileText, Link, Upload, Layers, Image, X } from 'lucide-react';
 import { Category } from '../types';
 
 interface SidebarProps {
