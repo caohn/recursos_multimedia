@@ -219,7 +219,9 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      // Actualizar en Supabase primero
+      console.log('Updating category:', { id, categoryData });
+      
+      // Convertir campos del frontend al formato de la base de datos
       const { error } = await supabase
         .from('categories')
         .update({
@@ -227,11 +229,16 @@ export const useAppData = () => {
           color: categoryData.color,
           description: categoryData.description,
           icon: categoryData.icon,
-          resource_type: categoryData.resourceType,
+          resource_type: categoryData.resourceType, // Asegurar que el campo coincida con la DB
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
+
+      console.log('Category updated in Supabase successfully');
 
       // Actualizar estado local solo si Supabase fue exitoso
       setState(prev => ({
@@ -244,7 +251,7 @@ export const useAppData = () => {
       console.log('Category updated successfully:', { id, categoryData });
     } catch (error) {
       console.error('Error updating category:', error);
-      alert('Error al actualizar la categoría. Inténtalo de nuevo.');
+      alert(`Error al actualizar la categoría: ${error.message || 'Error desconocido'}`);
       // Recargar datos para asegurar consistencia
       loadInitialData();
     }
