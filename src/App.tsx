@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Menu, X, Folder } from 'lucide-react';
-import { Login } from './components/Login';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { ResourceCard } from './components/ResourceCard';
 import { ResourceForm } from './components/ResourceForm';
 import { CategoryForm } from './components/CategoryForm';
+import { LoginModal } from './components/LoginModal';
 import { useAppData } from './hooks/useAppData';
 import { Resource, Category } from './types';
 
@@ -13,13 +13,10 @@ function App() {
   const { state, filteredResources, actions } = useAppData();
   const [isResourceFormOpen, setIsResourceFormOpen] = useState(false);
   const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  if (!state.isAuthenticated) {
-    return <Login onLogin={actions.login} />;
-  }
 
   const handleResourceSubmit = (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingResource) {
@@ -52,13 +49,27 @@ function App() {
   };
 
   const handleAddResource = () => {
+    if (!state.isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
     setEditingResource(null);
     setIsResourceFormOpen(true);
   };
 
   const handleAddCategory = () => {
+    if (!state.isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
     setEditingCategory(null);
     setIsCategoryFormOpen(true);
+  };
+
+  const handleLogin = () => {
+    actions.login();
+    setIsLoginModalOpen(false);
+    setIsResourceFormOpen(true);
   };
 
   const getCategoryById = (id: string) => {
@@ -81,6 +92,7 @@ function App() {
         onAddCategory={handleAddCategory}
         onEditCategory={handleEditCategory}
         isCollapsed={isSidebarCollapsed}
+        isAuthenticated={state.isAuthenticated}
       />
 
       {/* Main content */}
@@ -93,6 +105,7 @@ function App() {
           onViewChange={actions.setView}
           onLogout={actions.logout}
           onAddResource={handleAddResource}
+          isAuthenticated={state.isAuthenticated}
         />
 
         {/* Toggle sidebar button on mobile */}
@@ -169,6 +182,7 @@ function App() {
                     onEdit={handleEditResource}
                     onDelete={actions.deleteResource}
                     view={state.view}
+                    isAuthenticated={state.isAuthenticated}
                   />
                 ))}
               </div>
@@ -178,6 +192,12 @@ function App() {
       </div>
 
       {/* Modals */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleLogin}
+      />
+
       <ResourceForm
         isOpen={isResourceFormOpen}
         onClose={() => {

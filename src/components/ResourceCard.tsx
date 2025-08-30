@@ -8,6 +8,7 @@ interface ResourceCardProps {
   onEdit: (resource: Resource) => void;
   onDelete: (resourceId: string) => void;
   view: 'grid' | 'list';
+  isAuthenticated: boolean;
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
@@ -16,6 +17,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   onEdit,
   onDelete,
   view,
+  isAuthenticated,
 }) => {
   const getTypeIcon = (type: Resource['type']) => {
     switch (type) {
@@ -39,6 +41,25 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
     }
   };
 
+  const isVideoUrl = (url: string) => {
+    const videoPatterns = [
+      /youtube\.com\/watch\?v=([^&]+)/,
+      /youtu\.be\/([^?]+)/,
+      /vimeo\.com\/(\d+)/,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  };
+
+  const getVideoThumbnail = (url: string) => {
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    if (youtubeMatch) {
+      return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
+    }
+    return null;
+  };
   const handleOpen = () => {
     if (resource.type === 'link' && resource.url) {
       window.open(resource.url, '_blank');
@@ -53,14 +74,40 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   };
 
   const TypeIcon = getTypeIcon(resource.type);
+  const videoThumbnail = resource.type === 'link' && resource.url && isVideoUrl(resource.url) 
+    ? getVideoThumbnail(resource.url) 
+    : null;
 
   if (view === 'list') {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow group">
         <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-lg ${getTypeColor(resource.type)}`}>
-            <TypeIcon className="h-5 w-5" />
-          </div>
+          {videoThumbnail ? (
+            <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+              <img
+                src={videoThumbnail}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+              <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
+                <TypeIcon className="h-5 w-5" />
+              </div>
+              <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                <div className="w-6 h-6 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                  <div className="w-0 h-0 border-l-[6px] border-l-gray-800 border-y-[4px] border-y-transparent ml-0.5"></div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={`p-3 rounded-lg ${getTypeColor(resource.type)}`}>
+              <TypeIcon className="h-5 w-5" />
+            </div>
+          )}
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -89,7 +136,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className={`flex items-center gap-2 transition-opacity ${isAuthenticated ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
             <button
               onClick={handleOpen}
               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -97,20 +144,24 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             >
               <ExternalLink className="h-4 w-4" />
             </button>
-            <button
-              onClick={() => onEdit(resource)}
-              className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-              title="Editar"
-            >
-              <Edit className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => onDelete(resource.id)}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Eliminar"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+            {isAuthenticated && (
+              <>
+                <button
+                  onClick={() => onEdit(resource)}
+                  className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                  title="Editar"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(resource.id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Eliminar"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -120,25 +171,52 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
-        <div className={`p-3 rounded-lg ${getTypeColor(resource.type)}`}>
-          <TypeIcon className="h-6 w-6" />
-        </div>
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onEdit(resource)}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Editar"
-          >
-            <Edit className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(resource.id)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            title="Eliminar"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
+        {videoThumbnail ? (
+          <div className="relative w-full h-32 rounded-lg overflow-hidden bg-gray-100 mb-4">
+            <img
+              src={videoThumbnail}
+              alt="Video thumbnail"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
+              <TypeIcon className="h-8 w-8" />
+            </div>
+            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                <div className="w-0 h-0 border-l-[12px] border-l-gray-800 border-y-[8px] border-y-transparent ml-1"></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start justify-between w-full">
+            <div className={`p-3 rounded-lg ${getTypeColor(resource.type)}`}>
+              <TypeIcon className="h-6 w-6" />
+            </div>
+            {isAuthenticated && (
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => onEdit(resource)}
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Editar"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(resource.id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Eliminar"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="mb-4">
@@ -182,7 +260,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         
         <button
           onClick={handleOpen}
-          className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm font-medium transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors"
         >
           Abrir
           <ExternalLink className="h-4 w-4" />

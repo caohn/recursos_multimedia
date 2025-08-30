@@ -33,7 +33,7 @@ const defaultCategories: Category[] = [
 
 export const useAppData = () => {
   const [state, setState] = useState<AppState>({
-    isAuthenticated: false,
+    isAuthenticated: true,
     resources: [],
     categories: defaultCategories,
     searchTerm: '',
@@ -49,7 +49,7 @@ export const useAppData = () => {
 
     setState(prev => ({
       ...prev,
-      isAuthenticated: savedAuth === 'true',
+      isAuthenticated: true, // Always start authenticated for viewing
       resources: savedResources ? JSON.parse(savedResources) : [],
       categories: savedCategories ? JSON.parse(savedCategories) : defaultCategories,
     }));
@@ -66,7 +66,7 @@ export const useAppData = () => {
   };
 
   const logout = () => {
-    setState(prev => ({ ...prev, isAuthenticated: false }));
+    setState(prev => ({ ...prev, isAuthenticated: true })); // Keep viewing access
     localStorage.removeItem(STORAGE_KEYS.AUTH);
   };
 

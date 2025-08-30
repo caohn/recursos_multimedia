@@ -8,6 +8,7 @@ interface HeaderProps {
   onViewChange: (view: 'grid' | 'list') => void;
   onLogout: () => void;
   onAddResource: () => void;
+  isAuthenticated: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onViewChange,
   onLogout,
   onAddResource,
+  isAuthenticated,
 }) => {
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
@@ -83,13 +85,15 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            <button
-              onClick={onLogout}
-              className="text-gray-600 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
-              title="Cerrar sesión"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            {isAuthenticated && (
+              <button
+                onClick={onLogout}
+                className="text-gray-600 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                title="Cerrar sesión"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
