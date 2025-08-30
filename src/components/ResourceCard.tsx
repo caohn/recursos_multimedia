@@ -158,11 +158,14 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Eliminar"
                 >
-                  <Trash2 className="h-4 w-4" />
+          <button
+            onClick={handleOpen}
+            className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all cursor-pointer"
+          >
                 </button>
               </>
             )}
-          </div>
+          </button>
         </div>
       </div>
     );
