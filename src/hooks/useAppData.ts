@@ -221,7 +221,7 @@ export const useAppData = () => {
     try {
       console.log('🔄 Updating category with data:', categoryData);
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('categories')
         .update({
           name: categoryData.name,
@@ -230,16 +230,14 @@ export const useAppData = () => {
           icon: categoryData.icon,
           resource_type: categoryData.resourceType,
         })
-        .eq('id', id)
-        .select()
-        .single();
+        .eq('id', id);
 
       if (error) {
         console.error('❌ Error updating category:', error);
         throw error;
       }
 
-      console.log('✅ Category updated successfully:', data);
+      console.log('✅ Category updated successfully');
       
       // Actualizar estado local
       setState(prev => ({
