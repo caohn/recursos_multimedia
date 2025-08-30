@@ -186,13 +186,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
               <TypeIcon className="h-8 w-8" />
             </div>
+            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                <div className="w-0 h-0 border-l-[12px] border-l-gray-800 border-y-[8px] border-y-transparent ml-1"></div>
+              </div>
+            </div>
             <button
               onClick={handleOpen}
               className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all cursor-pointer"
             >
-              <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
-                <div className="w-0 h-0 border-l-[12px] border-l-gray-800 border-y-[8px] border-y-transparent ml-1"></div>
-              </div>
             </button>
           </div>
         ) : (
