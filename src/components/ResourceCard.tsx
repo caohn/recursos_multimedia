@@ -86,10 +86,18 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.nextElementSibling?.classList.remove('hidden');
-                }}
-              />
+              {category.name === 'Lecciones M&M' ? (
+                <img 
+                  src="https://igcsl.org/subidas/logomm.png" 
+                  alt="M&M Logo" 
+                  className="w-3 h-3 rounded-full object-cover"
+                />
+              ) : (
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: category.color }}
+                />
+              )}
               <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
                 <TypeIcon className="h-5 w-5" />
               </div>
@@ -118,10 +126,18 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <div className="flex items-center gap-2 sm:gap-4 mt-2">
               {category && (
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500 truncate">
-                  <div 
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: category.color }}
-                  />
+                  {category.name === 'Lecciones M&M' ? (
+                    <img 
+                      src="https://igcsl.org/subidas/logomm.png" 
+                      alt="M&M Logo" 
+                      className="w-3 h-3 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: category.color }}
+                    />
+                  )}
                   <span className="truncate">{category.name}</span>
                 </span>
               )}
@@ -257,10 +273,18 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <div className="flex items-center gap-2 min-w-0">
               <div 
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: category.color }}
-              />
-              <span className="text-xs text-gray-600 truncate">{category.name}</span>
-            </div>
+                  {category.name === 'Lecciones M&M' ? (
+                    <img 
+                      src="https://igcsl.org/subidas/logomm.png" 
+                      alt="M&M Logo" 
+                      className="w-2 h-2 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: category.color }}
+                    />
+                  )}
           )}
         </div>
         

@@ -119,6 +119,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
                         style={{ backgroundColor: category.color }}
                       />
+                      {category.name === 'Lecciones M&M' ? (
+                        <img 
+                          src="https://igcsl.org/subidas/logomm.png" 
+                          alt="M&M Logo" 
+                          className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm object-cover"
+                        />
+                      ) : (
+                        <div 
+                          className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                          style={{ backgroundColor: category.color }}
+                        />
+                      )}
                       <span className="font-medium truncate flex-1 text-left text-sm">{category.name}</span>
                       {isAuthenticated && (
                         <button
