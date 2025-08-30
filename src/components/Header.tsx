@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Search, Grid3X3, List, Plus } from 'lucide-react';
+import { LogOut, Search, Grid3X3, List, Plus, Menu } from 'lucide-react';
 
 interface HeaderProps {
   searchTerm: string;
