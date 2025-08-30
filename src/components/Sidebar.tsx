@@ -115,10 +115,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
-                      <div 
-                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
-                        style={{ backgroundColor: category.color }}
-                      />
                       {category.name === 'Lecciones M&M' ? (
                         <img 
                           src="https://igcsl.org/subidas/logomm.png" 
