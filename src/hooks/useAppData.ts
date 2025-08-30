@@ -216,11 +216,19 @@ export const useAppData = () => {
       alert('Error al agregar la categoría. Inténtalo de nuevo.');
     }
   };
+
+  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
+    try {
+      const updateData = {
           ...(categoryData.name && { name: categoryData.name }),
           ...(categoryData.color && { color: categoryData.color }),
           ...(categoryData.description !== undefined && { description: categoryData.description }),
           ...(categoryData.icon && { icon: categoryData.icon }),
           ...(categoryData.resourceType && { resource_type: categoryData.resourceType }),
+        };
+
+      const { error } = await supabase
+        .from('categories')
         .update(updateData)
         .eq('id', id)
         .select();
