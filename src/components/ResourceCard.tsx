@@ -202,21 +202,6 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <div className={`hidden absolute inset-0 flex items-center justify-center ${getTypeColor(resource.type)}`}>
               <TypeIcon className="h-8 w-8" />
             </div>
-            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
-                <div className="w-0 h-0 border-l-[8px] sm:border-l-[12px] border-l-gray-800 border-y-[6px] sm:border-y-[8px] border-y-transparent ml-1"></div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start justify-between w-full">
-            <div className={`p-2 sm:p-3 rounded-lg ${getTypeColor(resource.type)}`}>
-              <TypeIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-            {isAuthenticated && (
-              <div className="flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={(e) => {
                     e.stopPropagation();
                     onEdit(resource);
                   }}
@@ -271,20 +256,20 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         <div className="flex items-center gap-2 min-w-0">
           {category && (
             <div className="flex items-center gap-2 min-w-0">
-              <div 
-                className="w-3 h-3 rounded-full"
-                  {category.name === 'Lecciones M&M' ? (
-                    <img 
-                      src="https://igcsl.org/subidas/logomm.png" 
-                      alt="M&M Logo" 
-                      className="w-2 h-2 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div 
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
-                  )}
+              {category.name === 'Lecciones M&M' ? (
+                <img 
+                  src="https://igcsl.org/subidas/logomm.png" 
+                  alt="M&M Logo" 
+                  className="w-3 h-3 rounded-full object-cover"
+                />
+              ) : (
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: category.color }}
+                />
+              )}
+              <span className="text-xs text-gray-500 truncate">{category.name}</span>
+            </div>
           )}
         </div>
         
