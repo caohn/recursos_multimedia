@@ -91,6 +91,34 @@ export const useAppData = () => {
         throw new Error('Título y categoría son requeridos');
       }
 
+      let fileUrl = null;
+      let fileName = null;
+      let fileSize = null;
+
+      // Si hay un archivo, subirlo a Supabase Storage
+      if (resourceData.file) {
+        const file = resourceData.file;
+        const fileExt = file.name.split('.').pop();
+        const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('resources')
+          .upload(uniqueFileName, file);
+
+        if (uploadError) {
+          throw new Error(`Error al subir archivo: ${uploadError.message}`);
+        }
+
+        // Obtener URL pública del archivo
+        const { data: urlData } = supabase.storage
+          .from('resources')
+          .getPublicUrl(uniqueFileName);
+
+        fileUrl = urlData.publicUrl;
+        fileName = file.name;
+        fileSize = file.size;
+      }
+
       // Preparar datos para insertar
       const insertData = {
         title: resourceData.title,
@@ -98,17 +126,14 @@ export const useAppData = () => {
         description: resourceData.description || '',
         category_id: resourceData.category,
         tags: resourceData.tags || [],
+        ...(fileUrl && { url: fileUrl }),
+        ...(fileName && { file_name: fileName }),
+        ...(fileSize && { file_size: fileSize }),
       };
 
       // Solo agregar URL si es tipo link y tiene URL
-      if (resourceData.type === 'link' && resourceData.url) {
+      if (resourceData.type === 'link' && resourceData.url && !fileUrl) {
         insertData.url = resourceData.url;
-      }
-
-      // Solo agregar info de archivo si existe
-      if (resourceData.file) {
-        insertData.file_name = resourceData.file.name;
-        insertData.file_size = resourceData.file.size;
       }
 
       const { data, error } = await supabase
@@ -130,7 +155,6 @@ export const useAppData = () => {
         tags: data.tags || [],
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
-        file: resourceData.file,
       };
 
       setState(prev => ({
@@ -145,19 +169,49 @@ export const useAppData = () => {
 
   const updateResource = async (id: string, resourceData: Partial<Resource>) => {
     try {
+      let fileUrl = null;
+      let fileName = null;
+      let fileSize = null;
+
+      // Si hay un archivo nuevo, subirlo
+      if (resourceData.file) {
+        const file = resourceData.file;
+        const fileExt = file.name.split('.').pop();
+        const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('resources')
+          .upload(uniqueFileName, file);
+
+        if (uploadError) {
+          throw new Error(`Error al subir archivo: ${uploadError.message}`);
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('resources')
+          .getPublicUrl(uniqueFileName);
+
+        fileUrl = urlData.publicUrl;
+        fileName = file.name;
+        fileSize = file.size;
+      }
+
+      const updateData = {
+        ...(resourceData.title && { title: resourceData.title }),
+        ...(resourceData.type && { type: resourceData.type }),
+        ...(resourceData.description !== undefined && { description: resourceData.description }),
+        ...(resourceData.category && { category_id: resourceData.category }),
+        ...(resourceData.tags && { tags: resourceData.tags }),
+        ...(fileUrl && { url: fileUrl }),
+        ...(fileName && { file_name: fileName }),
+        ...(fileSize && { file_size: fileSize }),
+        ...(resourceData.url && resourceData.type === 'link' && !fileUrl && { url: resourceData.url }),
+        updated_at: new Date().toISOString(),
+      };
+
       const { error } = await supabase
         .from('resources')
-        .update({
-          title: resourceData.title,
-          type: resourceData.type,
-          url: resourceData.url,
-          description: resourceData.description,
-          category_id: resourceData.category,
-          tags: resourceData.tags,
-          file_name: resourceData.file?.name,
-          file_size: resourceData.file?.size,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;

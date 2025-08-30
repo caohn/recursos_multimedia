@@ -63,13 +63,9 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   const handleOpen = () => {
     if (resource.type === 'link' && resource.url) {
       window.open(resource.url, '_blank');
-    } else if (resource.file) {
-      const url = URL.createObjectURL(resource.file);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = resource.file.name;
-      a.click();
-      URL.revokeObjectURL(url);
+    } else if (resource.url && (resource.type === 'file' || resource.type === 'document')) {
+      // Para archivos almacenados en Supabase Storage, abrir en nueva pestaña
+      window.open(resource.url, '_blank');
     }
   };
 
