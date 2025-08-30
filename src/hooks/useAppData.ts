@@ -21,14 +21,6 @@ export const useAppData = () => {
     loadInitialData();
   }, []);
 
-  // Verificar autenticación guardada
-  useEffect(() => {
-    const savedAuth = localStorage.getItem(STORAGE_KEY_AUTH);
-    if (savedAuth === 'true') {
-      setState(prev => ({ ...prev, isAuthenticated: true }));
-    }
-  }, []);
-
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -86,12 +78,10 @@ export const useAppData = () => {
 
   const login = () => {
     setState(prev => ({ ...prev, isAuthenticated: true }));
-    localStorage.setItem(STORAGE_KEY_AUTH, 'true');
   };
 
   const logout = () => {
     setState(prev => ({ ...prev, isAuthenticated: false }));
-    localStorage.removeItem(STORAGE_KEY_AUTH);
   };
 
   const addResource = async (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
