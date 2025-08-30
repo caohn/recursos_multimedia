@@ -27,4 +27,5 @@ export interface AppState {
   searchTerm: string;
   selectedCategory: string | null;
   view: 'grid' | 'list';
+  loading: boolean;
 }

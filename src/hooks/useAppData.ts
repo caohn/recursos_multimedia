@@ -1,142 +1,278 @@
 import { useState, useEffect } from 'react';
 import { Resource, Category, AppState } from '../types';
+import { supabase, DatabaseCategory, DatabaseResource } from '../lib/supabase';
 
-const STORAGE_KEYS = {
-  AUTH: 'resources_auth',
-  RESOURCES: 'resources_data',
-  CATEGORIES: 'categories_data',
-};
-
-const defaultCategories: Category[] = [
-  {
-    id: '1',
-    name: 'Documentos Importantes',
-    color: '#3B82F6',
-    description: 'Documentos oficiales y certificaciones',
-    icon: 'folder',
-    resourceType: 'documents',
-  },
-  {
-    id: '2',
-    name: 'Enlaces Útiles',
-    color: '#10B981',
-    description: 'Enlaces web de interés',
-    icon: 'folder',
-    resourceType: 'links',
-  },
-  {
-    id: '3',
-    name: 'Recursos Multimedia',
-    color: '#F59E0B',
-    description: 'Imágenes, videos y audio',
-    icon: 'folder',
-    resourceType: 'media',
-  },
-];
+const STORAGE_KEY_AUTH = 'resources_auth';
 
 export const useAppData = () => {
   const [state, setState] = useState<AppState>({
-    isAuthenticated: true,
+    isAuthenticated: false,
     resources: [],
-    categories: defaultCategories,
+    categories: [],
     searchTerm: '',
     selectedCategory: null,
     view: 'grid',
   });
 
-  // Load data from localStorage
-  useEffect(() => {
-    const savedAuth = localStorage.getItem(STORAGE_KEYS.AUTH);
-    const savedResources = localStorage.getItem(STORAGE_KEYS.RESOURCES);
-    const savedCategories = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
+  const [loading, setLoading] = useState(true);
 
-    setState(prev => ({
-      ...prev,
-      isAuthenticated: savedAuth === 'true',
-      resources: savedResources ? JSON.parse(savedResources) : [],
-      categories: savedCategories ? JSON.parse(savedCategories) : defaultCategories,
-    }));
+  // Cargar datos iniciales
+  useEffect(() => {
+    loadInitialData();
   }, []);
 
-  // Save to localStorage
-  const saveToStorage = (key: string, data: any) => {
-    localStorage.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
+  // Verificar autenticación guardada
+  useEffect(() => {
+    const savedAuth = localStorage.getItem(STORAGE_KEY_AUTH);
+    if (savedAuth === 'true') {
+      setState(prev => ({ ...prev, isAuthenticated: true }));
+    }
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Cargar categorías
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (categoriesError) throw categoriesError;
+
+      // Cargar recursos
+      const { data: resourcesData, error: resourcesError } = await supabase
+        .from('resources')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (resourcesError) throw resourcesError;
+
+      // Convertir datos de la base de datos al formato de la aplicación
+      const categories: Category[] = (categoriesData || []).map((cat: DatabaseCategory) => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color,
+        description: cat.description,
+        icon: cat.icon,
+        resourceType: cat.resource_type,
+      }));
+
+      const resources: Resource[] = (resourcesData || []).map((res: DatabaseResource) => ({
+        id: res.id,
+        title: res.title,
+        type: res.type,
+        url: res.url,
+        description: res.description,
+        category: res.category_id,
+        tags: res.tags || [],
+        createdAt: new Date(res.created_at),
+        updatedAt: new Date(res.updated_at),
+        file: res.file_name ? new File([], res.file_name) : undefined,
+      }));
+
+      setState(prev => ({
+        ...prev,
+        categories,
+        resources,
+      }));
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const login = () => {
     setState(prev => ({ ...prev, isAuthenticated: true }));
-    saveToStorage(STORAGE_KEYS.AUTH, 'true');
+    localStorage.setItem(STORAGE_KEY_AUTH, 'true');
   };
 
   const logout = () => {
     setState(prev => ({ ...prev, isAuthenticated: false }));
-    localStorage.removeItem(STORAGE_KEYS.AUTH);
+    localStorage.removeItem(STORAGE_KEY_AUTH);
   };
 
-  const addResource = (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newResource: Resource = {
-      ...resourceData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  const addResource = async (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('resources')
+        .insert({
+          title: resourceData.title,
+          type: resourceData.type,
+          url: resourceData.url,
+          description: resourceData.description,
+          category_id: resourceData.category,
+          tags: resourceData.tags,
+          file_name: resourceData.file?.name,
+          file_size: resourceData.file?.size,
+        })
+        .select()
+        .single();
 
-    setState(prev => {
-      const newResources = [...prev.resources, newResource];
-      saveToStorage(STORAGE_KEYS.RESOURCES, newResources);
-      return { ...prev, resources: newResources };
-    });
+      if (error) throw error;
+
+      // Agregar al estado local
+      const newResource: Resource = {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        url: data.url,
+        description: data.description,
+        category: data.category_id,
+        tags: data.tags || [],
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+        file: resourceData.file,
+      };
+
+      setState(prev => ({
+        ...prev,
+        resources: [newResource, ...prev.resources],
+      }));
+    } catch (error) {
+      console.error('Error adding resource:', error);
+      alert('Error al agregar el recurso. Inténtalo de nuevo.');
+    }
   };
 
-  const updateResource = (id: string, resourceData: Partial<Resource>) => {
-    setState(prev => {
-      const newResources = prev.resources.map(resource =>
-        resource.id === id
-          ? { ...resource, ...resourceData, updatedAt: new Date() }
-          : resource
-      );
-      saveToStorage(STORAGE_KEYS.RESOURCES, newResources);
-      return { ...prev, resources: newResources };
-    });
+  const updateResource = async (id: string, resourceData: Partial<Resource>) => {
+    try {
+      const { error } = await supabase
+        .from('resources')
+        .update({
+          title: resourceData.title,
+          type: resourceData.type,
+          url: resourceData.url,
+          description: resourceData.description,
+          category_id: resourceData.category,
+          tags: resourceData.tags,
+          file_name: resourceData.file?.name,
+          file_size: resourceData.file?.size,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Actualizar estado local
+      setState(prev => ({
+        ...prev,
+        resources: prev.resources.map(resource =>
+          resource.id === id
+            ? { ...resource, ...resourceData, updatedAt: new Date() }
+            : resource
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      alert('Error al actualizar el recurso. Inténtalo de nuevo.');
+    }
   };
 
-  const deleteResource = (id: string) => {
-    setState(prev => {
-      const newResources = prev.resources.filter(resource => resource.id !== id);
-      saveToStorage(STORAGE_KEYS.RESOURCES, newResources);
-      return { ...prev, resources: newResources };
-    });
+  const deleteResource = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('resources')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Actualizar estado local
+      setState(prev => ({
+        ...prev,
+        resources: prev.resources.filter(resource => resource.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      alert('Error al eliminar el recurso. Inténtalo de nuevo.');
+    }
   };
 
-  const addCategory = (categoryData: Omit<Category, 'id'>) => {
-    const newCategory: Category = {
-      ...categoryData,
-      id: Date.now().toString(),
-    };
+  const addCategory = async (categoryData: Omit<Category, 'id'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: categoryData.name,
+          color: categoryData.color,
+          description: categoryData.description,
+          icon: categoryData.icon,
+          resource_type: categoryData.resourceType,
+        })
+        .select()
+        .single();
 
-    setState(prev => {
-      const newCategories = [...prev.categories, newCategory];
-      saveToStorage(STORAGE_KEYS.CATEGORIES, newCategories);
-      return { ...prev, categories: newCategories };
-    });
+      if (error) throw error;
+
+      // Agregar al estado local
+      const newCategory: Category = {
+        id: data.id,
+        name: data.name,
+        color: data.color,
+        description: data.description,
+        icon: data.icon,
+        resourceType: data.resource_type,
+      };
+
+      setState(prev => ({
+        ...prev,
+        categories: [...prev.categories, newCategory],
+      }));
+    } catch (error) {
+      console.error('Error adding category:', error);
+      alert('Error al agregar la categoría. Inténtalo de nuevo.');
+    }
   };
 
-  const updateCategory = (id: string, categoryData: Partial<Category>) => {
-    setState(prev => {
-      const newCategories = prev.categories.map(category =>
-        category.id === id ? { ...category, ...categoryData } : category
-      );
-      saveToStorage(STORAGE_KEYS.CATEGORIES, newCategories);
-      return { ...prev, categories: newCategories };
-    });
+  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({
+          name: categoryData.name,
+          color: categoryData.color,
+          description: categoryData.description,
+          icon: categoryData.icon,
+          resource_type: categoryData.resourceType,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Actualizar estado local
+      setState(prev => ({
+        ...prev,
+        categories: prev.categories.map(category =>
+          category.id === id ? { ...category, ...categoryData } : category
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating category:', error);
+      alert('Error al actualizar la categoría. Inténtalo de nuevo.');
+    }
   };
 
-  const deleteCategory = (id: string) => {
-    setState(prev => {
-      const newCategories = prev.categories.filter(category => category.id !== id);
-      saveToStorage(STORAGE_KEYS.CATEGORIES, newCategories);
-      return { ...prev, categories: newCategories };
-    });
+  const deleteCategory = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Actualizar estado local
+      setState(prev => ({
+        ...prev,
+        categories: prev.categories.filter(category => category.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      alert('Error al eliminar la categoría. Inténtalo de nuevo.');
+    }
   };
 
   const setSearchTerm = (term: string) => {
@@ -151,7 +287,7 @@ export const useAppData = () => {
     setState(prev => ({ ...prev, view }));
   };
 
-  // Filtered resources
+  // Filtrar recursos
   const filteredResources = state.resources.filter(resource => {
     const matchesSearch = resource.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
                          resource.description.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
@@ -163,7 +299,7 @@ export const useAppData = () => {
   });
 
   return {
-    state,
+    state: { ...state, loading },
     filteredResources,
     actions: {
       login,

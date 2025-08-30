@@ -140,7 +140,7 @@ function App() {
             </div>
 
             {/* Empty state */}
-            {filteredResources.length === 0 && (
+            {!state.loading && filteredResources.length === 0 && (
               <div className="text-center py-16">
                 <div className="max-w-md mx-auto">
                   <div className="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
@@ -168,7 +168,7 @@ function App() {
             )}
 
             {/* Resources grid/list */}
-            {filteredResources.length > 0 && (
+            {!state.loading && filteredResources.length > 0 && (
               <div className={
                 state.view === 'grid'
                   ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
@@ -185,6 +185,14 @@ function App() {
                     isAuthenticated={state.isAuthenticated}
                   />
                 ))}
+              </div>
+            )}
+
+            {/* Loading state */}
+            {state.loading && (
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+                <p className="text-gray-600">Cargando recursos...</p>
               </div>
             )}
           </div>
