@@ -219,45 +219,71 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      console.log('Attempting to update category:', { id, categoryData });
+      console.log('🔄 Starting category update:', { id, categoryData });
       
-      // Mapear campos del frontend a la base de datos
-      const updateData: any = {
-        name: categoryData.name,
-        color: categoryData.color,
-        description: categoryData.description,
-        icon: categoryData.icon,
-        resource_type: categoryData.resourceType,
-      };
-      
-      console.log('Mapped data for Supabase:', updateData);
-      
-      const { error } = await supabase
-        .from('categories')
-        .update(updateData)
-        .eq('id', id);
-
-      if (error) {
-        console.error('Supabase error details:', error);
-        throw error;
+      // Verificar que tenemos los datos necesarios
+      if (!id || !categoryData) {
+        throw new Error('ID o datos de categoría faltantes');
       }
 
-      console.log('✅ Category updated successfully in Supabase');
+      // Preparar datos para Supabase (solo campos que han cambiado)
+      const updateData: any = {};
+      
+      if (categoryData.name !== undefined) updateData.name = categoryData.name;
+      if (categoryData.color !== undefined) updateData.color = categoryData.color;
+      if (categoryData.description !== undefined) updateData.description = categoryData.description;
+      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
+      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
 
+      console.log('📤 Sending to Supabase:', { id, updateData });
+
+      const { data, error } = await supabase
+        .from('categories')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      console.log('📥 Supabase response:', { data, error });
+
+      if (error) {
+        console.error('❌ Supabase update failed:', error);
+        throw new Error(`Error de Supabase: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error('No se recibieron datos de la actualización');
+      }
+
+      console.log('✅ Category updated successfully in Supabase:', data);
       // Actualizar estado local
       setState(prev => ({
         ...prev,
         categories: prev.categories.map(category =>
-          category.id === id ? { ...category, ...categoryData } : category
+          category.id === id 
+            ? { 
+                ...category, 
+                name: data.name,
+                color: data.color,
+                description: data.description,
+                icon: data.icon,
+                resourceType: data.resource_type,
+              } 
+            : category
         ),
       }));
       
-      console.log('✅ Local state updated');
+      console.log('✅ Local state updated successfully');
+      
     } catch (error) {
-      console.error('Error updating category:', error);
-      alert(`Error al actualizar la categoría: ${(error as any)?.message || 'Error desconocido'}`);
+      console.error('💥 Complete error details:', error);
+      
+      // Mostrar error específico al usuario
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`❌ Error al actualizar la categoría: ${errorMessage}`);
       
       // Recargar datos para mantener consistencia
+      console.log('🔄 Reloading data to maintain consistency...');
       loadInitialData();
     }
   };
