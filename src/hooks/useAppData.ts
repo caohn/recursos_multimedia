@@ -64,10 +64,14 @@ export const useAppData = () => {
         file: res.file_name ? new File([], res.file_name) : undefined,
       }));
 
+      // Buscar la categoría "Lecciones M&M" para seleccionarla por defecto
+      const mmCategory = categories.find(cat => cat.name === 'Lecciones M&M');
+      const defaultSelectedCategory = mmCategory ? mmCategory.id : null;
       setState(prev => ({
         ...prev,
         categories,
         resources,
+        selectedCategory: defaultSelectedCategory,
       }));
     } catch (error) {
       console.error('Error loading data:', error);
