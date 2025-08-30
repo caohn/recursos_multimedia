@@ -219,25 +219,29 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      console.log('🔄 Updating category with data:', categoryData);
+      console.log('🔄 Actualizando categoría:', id, categoryData);
+
+      const updateData = {
+        name: categoryData.name,
+        color: categoryData.color,
+        description: categoryData.description,
+        icon: categoryData.icon,
+        resource_type: categoryData.resourceType,
+      };
+
+      console.log('📤 Datos a enviar a Supabase:', updateData);
 
       const { error } = await supabase
         .from('categories')
-        .update({
-          name: categoryData.name,
-          color: categoryData.color,
-          description: categoryData.description,
-          icon: categoryData.icon,
-          resource_type: categoryData.resourceType,
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) {
-        console.error('❌ Error updating category:', error);
+        console.error('❌ Error de Supabase:', error);
         throw error;
       }
 
-      console.log('✅ Category updated successfully');
+      console.log('✅ Categoría actualizada en Supabase');
       
       // Actualizar estado local
       setState(prev => ({
@@ -246,9 +250,11 @@ export const useAppData = () => {
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
+
+      console.log('✅ Estado local actualizado');
       
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error('💥 Error completo:', error);
       alert('Error al actualizar la categoría. Inténtalo de nuevo.');
     }
   };
