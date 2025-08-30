@@ -219,28 +219,27 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      // Preparar datos para Supabase (convertir resourceType a resource_type)
-      const updateData = {
-        name: categoryData.name,
-        color: categoryData.color,
-        description: categoryData.description,
-        icon: categoryData.icon,
-        resource_type: categoryData.resourceType,
-      };
+      console.log('🔄 Updating category with data:', categoryData);
 
-      console.log('📤 Sending to Supabase:', updateData);
-
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('categories')
-        .update(updateData)
-        .eq('id', id);
+        .update({
+          name: categoryData.name,
+          color: categoryData.color,
+          description: categoryData.description,
+          icon: categoryData.icon,
+          resource_type: categoryData.resourceType,
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
-        console.error('❌ Supabase error:', error);
+        console.error('❌ Error updating category:', error);
         throw error;
       }
 
-      console.log('✅ Supabase update successful');
+      console.log('✅ Category updated successfully:', data);
       
       // Actualizar estado local
       setState(prev => ({
@@ -249,8 +248,6 @@ export const useAppData = () => {
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
-
-      console.log('✅ Local state updated');
       
     } catch (error) {
       console.error('Error updating category:', error);
