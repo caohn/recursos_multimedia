@@ -221,13 +221,13 @@ export const useAppData = () => {
     try {
       console.log('🔄 Actualizando categoría:', id, categoryData);
 
-      const updateData = {
-        name: categoryData.name,
-        color: categoryData.color,
-        description: categoryData.description,
-        icon: categoryData.icon,
-        resource_type: categoryData.resourceType,
-      };
+      // Mapear correctamente los campos para Supabase
+      const updateData: any = {};
+      if (categoryData.name !== undefined) updateData.name = categoryData.name;
+      if (categoryData.color !== undefined) updateData.color = categoryData.color;
+      if (categoryData.description !== undefined) updateData.description = categoryData.description;
+      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
+      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
 
       console.log('📤 Datos a enviar a Supabase:', updateData);
 
