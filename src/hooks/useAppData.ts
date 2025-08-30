@@ -86,18 +86,34 @@ export const useAppData = () => {
 
   const addResource = async (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
+      // Validar datos requeridos
+      if (!resourceData.title || !resourceData.category) {
+        throw new Error('Título y categoría son requeridos');
+      }
+
+      // Preparar datos para insertar
+      const insertData = {
+        title: resourceData.title,
+        type: resourceData.type,
+        description: resourceData.description || '',
+        category_id: resourceData.category,
+        tags: resourceData.tags || [],
+      };
+
+      // Solo agregar URL si es tipo link y tiene URL
+      if (resourceData.type === 'link' && resourceData.url) {
+        insertData.url = resourceData.url;
+      }
+
+      // Solo agregar info de archivo si existe
+      if (resourceData.file) {
+        insertData.file_name = resourceData.file.name;
+        insertData.file_size = resourceData.file.size;
+      }
+
       const { data, error } = await supabase
         .from('resources')
-        .insert({
-          title: resourceData.title,
-          type: resourceData.type,
-          url: resourceData.url,
-          description: resourceData.description,
-          category_id: resourceData.category,
-          tags: resourceData.tags,
-          file_name: resourceData.file?.name,
-          file_size: resourceData.file?.size,
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -123,7 +139,7 @@ export const useAppData = () => {
       }));
     } catch (error) {
       console.error('Error adding resource:', error);
-      alert('Error al agregar el recurso. Inténtalo de nuevo.');
+      alert(`Error al agregar el recurso: ${error.message}`);
     }
   };
 

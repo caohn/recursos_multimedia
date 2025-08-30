@@ -55,7 +55,25 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.category) return;
+    if (!formData.title.trim()) {
+      alert('El título es requerido');
+      return;
+    }
+
+    if (!formData.category) {
+      alert('Debes seleccionar una categoría');
+      return;
+    }
+
+    if (formData.type === 'link' && !formData.url.trim()) {
+      alert('La URL es requerida para enlaces');
+      return;
+    }
+
+    if ((formData.type === 'file' || formData.type === 'document') && !file && !editingResource) {
+      alert('Debes seleccionar un archivo');
+      return;
+    }
 
     onSubmit({
       ...formData,
