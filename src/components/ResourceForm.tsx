@@ -108,11 +108,11 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-xl sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               {editingResource ? 'Editar Recurso' : 'Agregar Recurso'}
             </h2>
             <button
@@ -124,13 +124,13 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Tipo de recurso */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Tipo de recurso
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
                 { type: 'link', icon: Link, label: 'Enlace' },
                 { type: 'document', icon: FileText, label: 'Documento' },
@@ -146,7 +146,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
                       : 'border-gray-200 hover:border-gray-300 text-gray-600'
                   }`}
                 >
-                  <Icon className="h-6 w-6" />
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   <span className="text-sm font-medium">{label}</span>
                 </button>
               ))}
@@ -162,7 +162,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Nombre del recurso"
               required
             />
@@ -178,7 +178,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
                 type="url"
                 value={formData.url}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="https://ejemplo.com"
                 required
               />
@@ -188,7 +188,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {formData.type === 'file' ? 'Archivo' : 'Documento'} *
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-gray-400 transition-colors">
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -197,7 +197,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
                   accept={formData.type === 'document' ? '.pdf,.doc,.docx,.txt' : '*'}
                 />
                 <label htmlFor="file-input" className="cursor-pointer">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600">
                     {file ? file.name : 'Haz clic para seleccionar un archivo'}
                   </p>
@@ -219,8 +219,8 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              rows={2}
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               placeholder="Descripción opcional del recurso"
             />
           </div>
@@ -235,7 +235,7 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
               <select
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               >
                 <option value="">Seleccionar categoría</option>
@@ -277,21 +277,21 @@ export const ResourceForm: React.FC<ResourceFormProps> = ({
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={addTag}
               placeholder="Escribe una etiqueta y presiona Enter"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 py-2 px-4 text-sm sm:text-base border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 py-2 px-4 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               {editingResource ? 'Actualizar recurso' : 'Guardar recurso'}
             </button>

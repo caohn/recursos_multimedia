@@ -16,7 +16,7 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   const handleResourceSubmit = (resourceData: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingResource) {
@@ -83,17 +83,28 @@ function App() {
   const resourceCount = filteredResources.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex relative">
       {/* Sidebar */}
-      <Sidebar
-        categories={state.categories}
-        selectedCategory={state.selectedCategory}
-        onCategorySelect={actions.setSelectedCategory}
-        onAddCategory={handleAddCategory}
-        onEditCategory={handleEditCategory}
-        isCollapsed={isSidebarCollapsed}
-        isAuthenticated={state.isAuthenticated}
-      />
+      <div className={`${isSidebarCollapsed ? 'hidden lg:block' : 'fixed lg:relative'} inset-y-0 left-0 z-50 lg:z-auto`}>
+        <Sidebar
+          categories={state.categories}
+          selectedCategory={state.selectedCategory}
+          onCategorySelect={actions.setSelectedCategory}
+          onAddCategory={handleAddCategory}
+          onEditCategory={handleEditCategory}
+          isCollapsed={false}
+          isAuthenticated={state.isAuthenticated}
+          onClose={() => setIsSidebarCollapsed(true)}
+        />
+      </div>
+
+      {/* Overlay para móvil */}
+      {!isSidebarCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarCollapsed(true)}
+        />
+      )}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -106,31 +117,24 @@ function App() {
           onLogout={actions.logout}
           onAddResource={handleAddResource}
           isAuthenticated={state.isAuthenticated}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
 
-        {/* Toggle sidebar button on mobile */}
-        <button
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className="lg:hidden fixed bottom-4 left-4 bg-blue-600 text-white p-3 rounded-full shadow-lg z-30 hover:bg-blue-700 transition-colors"
-        >
-          {isSidebarCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
-        </button>
-
         {/* Content area */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 sm:p-6">
           <div className="max-w-7xl mx-auto">
             {/* Title and stats */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     {selectedCategoryData ? selectedCategoryData.name : 'Todos los recursos'}
                   </h2>
                   {selectedCategoryData?.description && (
-                    <p className="text-gray-600 mt-1">{selectedCategoryData.description}</p>
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">{selectedCategoryData.description}</p>
                   )}
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <p className="text-sm text-gray-500">
                     {resourceCount} {resourceCount === 1 ? 'recurso' : 'recursos'}
                     {state.searchTerm && ' encontrados'}
@@ -171,8 +175,8 @@ function App() {
             {!state.loading && filteredResources.length > 0 && (
               <div className={
                 state.view === 'grid'
-                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                  : 'space-y-4'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'
+                  : 'space-y-3 sm:space-y-4'
               }>
                 {filteredResources.map((resource) => (
                   <ResourceCard

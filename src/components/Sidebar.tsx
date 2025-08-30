@@ -8,8 +8,8 @@ interface SidebarProps {
   onCategorySelect: (categoryId: string | null) => void;
   onAddCategory: () => void;
   onEditCategory: (category: Category) => void;
-  isCollapsed: boolean;
   isAuthenticated: boolean;
+  onClose: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -18,8 +18,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCategorySelect,
   onAddCategory,
   onEditCategory,
-  isCollapsed,
   isAuthenticated,
+  onClose,
 }) => {
   // Agrupar categorías por tipo de recurso
   const resourceTypes = [
@@ -54,9 +54,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className={`bg-white border-r border-gray-200 transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-72'
-    }`}>
+    <aside className="bg-white border-r border-gray-200 w-72 h-screen overflow-y-auto">
+      {/* Header móvil */}
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">Categorías</h2>
+        <button
+          onClick={onClose}
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
       <div className="p-4 space-y-4 h-full">
         {/* Todas las categorías */}
         <div>
@@ -69,37 +78,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <FolderOpen className="h-5 w-5 flex-shrink-0" />
-            {!isCollapsed && (
-              <span className="font-medium">Todos los recursos</span>
-            )}
+            <span className="font-medium">Todos los recursos</span>
           </button>
         </div>
 
         {/* Tipos de recursos */}
         <div className="space-y-4">
-          {!isCollapsed && (
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-900">Tipos de recursos</h3>
-              {isAuthenticated && (
-                <button
-                  onClick={onAddCategory}
-                  className="text-gray-500 hover:text-blue-600 transition-colors"
-                  title="Agregar categoría"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          )}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-900">Tipos de recursos</h3>
+            {isAuthenticated && (
+              <button
+                onClick={onAddCategory}
+                className="text-gray-500 hover:text-blue-600 transition-colors"
+                title="Agregar categoría"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
           {resourceTypes.filter(type => type.categories.length > 0).map((type) => (
             <div key={type.id} className="space-y-2">
-              {!isCollapsed && (
-                <div className="flex items-center gap-2 px-2 py-1">
-                  <type.icon className="h-4 w-4" style={{ color: type.color }} />
-                  <span className="text-sm font-medium text-gray-700">{type.name}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2 px-2 py-1">
+                <type.icon className="h-4 w-4" style={{ color: type.color }} />
+                <span className="text-sm font-medium text-gray-700">{type.name}</span>
+              </div>
               
               <div className="space-y-1 ml-2">
                 {type.categories.map((category) => (
@@ -116,22 +119,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
                         style={{ backgroundColor: category.color }}
                       />
-                      {!isCollapsed && (
-                        <>
-                          <span className="font-medium truncate flex-1 text-left text-sm">{category.name}</span>
-                          {isAuthenticated && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onEditCategory(category);
-                              }}
-                              className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-all p-1 rounded"
-                              title="Editar categoría"
-                            >
-                              <Edit className="h-3 w-3" />
-                            </button>
-                          )}
-                        </>
+                      <span className="font-medium truncate flex-1 text-left text-sm">{category.name}</span>
+                      {isAuthenticated && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditCategory(category);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-all p-1 rounded"
+                          title="Editar categoría"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </button>
                       )}
                     </button>
                   </div>
@@ -140,15 +139,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ))}
 
-          {isCollapsed && isAuthenticated && (
-            <button
-              onClick={onAddCategory}
-              className="w-full p-3 text-gray-500 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
-              title="Agregar categoría"
-            >
-              <Plus className="h-4 w-4 mx-auto" />
-            </button>
-          )}
         </div>
       </div>
     </aside>
