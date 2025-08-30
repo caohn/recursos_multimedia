@@ -219,6 +219,7 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
+      // Actualizar en Supabase primero
       const { error } = await supabase
         .from('categories')
         .update({
@@ -232,16 +233,20 @@ export const useAppData = () => {
 
       if (error) throw error;
 
-      // Actualizar estado local
+      // Actualizar estado local solo si Supabase fue exitoso
       setState(prev => ({
         ...prev,
         categories: prev.categories.map(category =>
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
+
+      console.log('Category updated successfully:', { id, categoryData });
     } catch (error) {
       console.error('Error updating category:', error);
       alert('Error al actualizar la categoría. Inténtalo de nuevo.');
+      // Recargar datos para asegurar consistencia
+      loadInitialData();
     }
   };
 
