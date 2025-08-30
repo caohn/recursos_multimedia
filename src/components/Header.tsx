@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
             />
             <div className="hidden sm:block">
               <h1 className="text-lg sm:text-xl font-bold text-gray-900">Recursos</h1>
-              <p className="text-xs text-gray-500 hidden sm:block">Plataforma privada</p>
+              <p className="text-xs text-gray-500 hidden sm:block">Plataforma IGC</p>
             </div>
           </div>
 
