@@ -219,16 +219,18 @@ export const useAppData = () => {
 
   const updateCategory = async (id: string, categoryData: Partial<Category>) => {
     try {
-      // Preparar datos para Supabase
-      const updateData: any = {};
+      console.log('Attempting to update category:', { id, categoryData });
       
-      if (categoryData.name !== undefined) updateData.name = categoryData.name;
-      if (categoryData.color !== undefined) updateData.color = categoryData.color;
-      if (categoryData.description !== undefined) updateData.description = categoryData.description;
-      if (categoryData.icon !== undefined) updateData.icon = categoryData.icon;
-      if (categoryData.resourceType !== undefined) updateData.resource_type = categoryData.resourceType;
+      // Mapear campos del frontend a la base de datos
+      const updateData: any = {
+        name: categoryData.name,
+        color: categoryData.color,
+        description: categoryData.description,
+        icon: categoryData.icon,
+        resource_type: categoryData.resourceType,
+      };
       
-      console.log('Updating category in Supabase:', { id, updateData });
+      console.log('Mapped data for Supabase:', updateData);
       
       const { error } = await supabase
         .from('categories')
@@ -236,22 +238,27 @@ export const useAppData = () => {
         .eq('id', id);
 
       if (error) {
-        console.error('Supabase update error:', error);
+        console.error('Supabase error details:', error);
         throw error;
       }
 
-      console.log('Category updated successfully in Supabase');
+      console.log('✅ Category updated successfully in Supabase');
 
-      // Actualizar estado local solo si Supabase fue exitoso
+      // Actualizar estado local
       setState(prev => ({
         ...prev,
         categories: prev.categories.map(category =>
           category.id === id ? { ...category, ...categoryData } : category
         ),
       }));
+      
+      console.log('✅ Local state updated');
     } catch (error) {
       console.error('Error updating category:', error);
-      alert(`Error al actualizar la categoría: ${error?.message || 'Error desconocido'}`);
+      alert(`Error al actualizar la categoría: ${(error as any)?.message || 'Error desconocido'}`);
+      
+      // Recargar datos para mantener consistencia
+      loadInitialData();
     }
   };
 
